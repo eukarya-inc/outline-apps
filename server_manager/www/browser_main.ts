@@ -117,7 +117,26 @@ async function ensureServerConfigured(): Promise<void> {
   }
   try {
     const response = await fetch('/config.json');
-    if (!response.ok) return;
+    if (!response.ok) {
+      // IAP may return a redirect or error on first visit before auth completes.
+      // Reload once to let the IAP cookie settle.
+      const reloadKey = 'iap_reload';
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, 'true');
+        window.location.reload();
+      }
+      return;
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      // Response is not JSON (likely an IAP login page), reload once.
+      const reloadKey = 'iap_reload';
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, 'true');
+        window.location.reload();
+      }
+      return;
+    }
     const config = await response.json();
     if (!config.apiUrl) return;
     const serverConfig = {

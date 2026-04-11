@@ -99,4 +99,35 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).redactSentryBreadcrumbUrl = undefined;
 
-import './main';
+// Auto-configure the server connection from the runtime config if no servers
+// are stored in local storage. The config.json endpoint is populated by
+// envsubst at container startup with the Shadowbox API prefix.
+async function ensureServerConfigured(): Promise<void> {
+  const storageKey = 'manualServers';
+  const existing = localStorage.getItem(storageKey);
+  if (existing) {
+    try {
+      const servers = JSON.parse(existing);
+      if (Array.isArray(servers) && servers.length > 0) {
+        return;
+      }
+    } catch {
+      // Invalid JSON, re-seed below.
+    }
+  }
+  try {
+    const response = await fetch('/config.json');
+    if (!response.ok) return;
+    const config = await response.json();
+    if (!config.apiUrl) return;
+    const serverConfig = {
+      apiUrl: `${window.location.origin}/${config.apiUrl}`,
+      certSha256: '',
+    };
+    localStorage.setItem(storageKey, JSON.stringify([serverConfig]));
+  } catch {
+    // Config endpoint not available, skip auto-configuration.
+  }
+}
+
+void ensureServerConfigured().then(() => import('./main'));

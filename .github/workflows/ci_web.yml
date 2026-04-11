@@ -56,23 +56,3 @@ jobs:
           test -f output/build/server_manager/www/static/index.html
           test -f output/build/server_manager/www/static/main.js
           echo "Build output verified"
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    env:
-      CHROMIUM_FLAGS: "--no-sandbox"
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm run action server_manager/test

@@ -1,0 +1,58 @@
+name: CI / Web
+
+on:
+  pull_request:
+    paths:
+      - "server_manager/**"
+      - "infrastructure/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/ci_web.yml"
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Web App
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build browser web app
+        run: ./node_modules/.bin/webpack --config=server_manager/browser.webpack.js --mode=production
+
+      - name: Verify build output
+        run: |
+          test -f output/build/server_manager/www/static/index.html
+          test -f output/build/server_manager/www/static/main.js
+          echo "Build output verified"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run action server_manager/test

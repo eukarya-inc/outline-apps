@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate install scripts
+        run: npm run action server_manager/www/build_install_script
+
       - name: Build browser web app
         run: ./node_modules/.bin/webpack --config=server_manager/browser.webpack.js --mode=production
 

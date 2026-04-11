@@ -10,7 +10,7 @@ on:
       - ".github/workflows/ci_web.yml"
   push:
     branches:
-      - main
+      - master
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}

@@ -130,4 +130,4 @@ async function ensureServerConfigured(): Promise<void> {
   }
 }
 
-ensureServerConfigured().then(() => import('./main'));
+void ensureServerConfigured().then(() => import('./main'));

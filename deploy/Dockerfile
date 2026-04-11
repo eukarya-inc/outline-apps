@@ -17,7 +17,10 @@ FROM nginx:1.27-alpine
 ENV SB_API_HOST=127.0.0.1
 ENV SB_API_PORT=61895
 ENV SB_API_PREFIX=changeme
+ENV NGINX_ENVSUBST_FILTER=SB_
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
 
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf.template /etc/nginx/templates/nginx.conf.template
 COPY static/ /usr/share/nginx/html/
 EXPOSE 8080

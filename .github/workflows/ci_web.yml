@@ -61,6 +61,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     continue-on-error: true
+    env:
+      CHROMIUM_FLAGS: "--no-sandbox"
     steps:
       - uses: actions/checkout@v6
 

@@ -35,5 +35,10 @@ http {
             return 200 'ok';
             add_header Content-Type text/plain;
         }
+
+        location /config.json {
+            default_type application/json;
+            return 200 '{"apiUrl":"${SB_API_PREFIX}"}';
+        }
     }
 }
